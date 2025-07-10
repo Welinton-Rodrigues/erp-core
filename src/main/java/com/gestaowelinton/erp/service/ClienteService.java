@@ -68,7 +68,56 @@ public List<Cliente> listarClientesPorEmpresa(Long idEmpresa) {
 public Cliente buscarClientePorId(Integer id) {
     return clienteRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Cliente não encontrado com o ID: " + id));
+}// ... dentro da classe ClienteService
+
+// ... outros métodos ...
+
+/**
+ * Atualiza os dados de um cliente existente.
+ * @param id O ID do cliente a ser atualizado.
+ * @param dadosAtualizados Objeto cliente com os novos dados.
+ * @return O cliente com os dados atualizados.
+ * @throws NoSuchElementException se o cliente não for encontrado.
+ */
+@Transactional
+public Cliente atualizarCliente(Integer id, Cliente dadosAtualizados) {
+    // 1. Busca o cliente existente no banco de dados.
+    //    Isso já lança NoSuchElementException se não encontrar, o que é perfeito.
+    Cliente clienteExistente = buscarClientePorId(id);
+
+    // 2. Atualiza os campos do cliente existente com os novos dados.
+    //    (Não atualizamos o CNPJ ou a empresa, pois geralmente são imutáveis)
+    clienteExistente.setNomeRazaoSocial(dadosAtualizados.getNomeRazaoSocial());
+    clienteExistente.setTipoCliente(dadosAtualizados.getTipoCliente());
+    clienteExistente.setTelefonePrincipal(dadosAtualizados.getTelefonePrincipal());
+    clienteExistente.setEmailPrincipal(dadosAtualizados.getEmailPrincipal());
+    
+    // 3. Salva o cliente atualizado. O JpaRepository é inteligente e sabe
+    //    que, como o objeto já tem um ID, ele deve fazer um UPDATE em vez de um INSERT.
+    return clienteRepository.save(clienteExistente);
 }
+
+// ... dentro da classe ClienteService
+
+// ... outros métodos ...
+
+/**
+ * Deleta um cliente pelo seu ID.
+ * @param id O ID do cliente a ser deletado.
+ * @throws NoSuchElementException se o cliente não for encontrado.
+ */
+@Transactional
+public void deletarCliente(Integer id) {
+    // 1. Verifica se o cliente existe antes de tentar deletar.
+    //    Se não existir, o findById já lança a exceção para nós.
+    if (!clienteRepository.existsById(id)) {
+        throw new NoSuchElementException("Cliente não encontrado com o ID: " + id);
+    }
+    
+    // 2. Se o cliente existe, deleta.
+    clienteRepository.deleteById(id);
+}
+
     // public List<Cliente> listarClientesPorEmpresa(Long idEmpresa) { ... }
     // public Cliente atualizarCliente(Integer id, Cliente cliente) { ... }
     // public void deletarCliente(Integer id) { ... }

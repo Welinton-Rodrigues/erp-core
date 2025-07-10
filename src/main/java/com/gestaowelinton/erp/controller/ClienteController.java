@@ -8,16 +8,16 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
-
-
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -36,6 +36,7 @@ public class ClienteController {
      * "cpfCnpj": "12.345.678/0001-99",
      * "tipoCliente": "Pessoa Jurídica"
      * }
+     * 
      * @param cliente O objeto Cliente recebido no corpo da requisição.
      * @return Uma resposta HTTP com o cliente criado e o status 201 (Created).
      */
@@ -53,36 +54,77 @@ public class ClienteController {
         }
     }
 
-    
-
-  
-    /** // <--- COMEÇA COM /**
+    /**
+     * // <--- COMEÇA COM /**
      * Endpoint para buscar um cliente por ID.
      * URL: GET http://localhost:8080/api/clientes/{id}
+     * 
      * @param id O ID do cliente passado na URL.
-     * @return Uma resposta HTTP com o cliente encontrado (200 OK) ou um erro (404 Not Found).
-     */ // 
-@GetMapping("/{id}")
-public ResponseEntity<?> buscarClientePorId(@PathVariable Integer id) {
-    try {
-        Cliente cliente = clienteService.buscarClientePorId(id);
-        return new ResponseEntity<>(cliente, HttpStatus.OK);
-    } catch (NoSuchElementException e) {
-        // Captura a exceção que o serviço lança se o cliente não for encontrado
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+     * @return Uma resposta HTTP com o cliente encontrado (200 OK) ou um erro (404
+     *         Not Found).
+     */ //
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarClientePorId(@PathVariable Integer id) {
+        try {
+            Cliente cliente = clienteService.buscarClientePorId(id);
+            return new ResponseEntity<>(cliente, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            // Captura a exceção que o serviço lança se o cliente não for encontrado
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
-}
 
+    /**
+     * Endpoint para listar todos os clientes de uma empresa.
+     * URL: GET http://localhost:8080/api/clientes?empresaId=1
+     * 
+     * @param idEmpresa O ID da empresa, passado como um parâmetro na URL.
+     * @return Uma resposta HTTP com a lista de clientes (200 OK).
+     */
+    @GetMapping
+    public ResponseEntity<List<Cliente>> listarClientesPorEmpresa(@RequestParam(name = "idEmpresa") Long idEmpresa) {
+        List<Cliente> clientes = clienteService.listarClientesPorEmpresa(idEmpresa);
+        return new ResponseEntity<>(clientes, HttpStatus.OK);
+    }
 
-/**
- * Endpoint para listar todos os clientes de uma empresa.
- * URL: GET http://localhost:8080/api/clientes?empresaId=1
- * @param idEmpresa O ID da empresa, passado como um parâmetro na URL.
- * @return Uma resposta HTTP com a lista de clientes (200 OK).
- */
-@GetMapping
-public ResponseEntity<List<Cliente>> listarClientesPorEmpresa(@RequestParam(name = "idEmpresa") Long idEmpresa) {
-    List<Cliente> clientes = clienteService.listarClientesPorEmpresa(idEmpresa);
-    return new ResponseEntity<>(clientes, HttpStatus.OK);
-}
+    /**
+     * Endpoint para atualizar um cliente existente.
+     * URL: PUT http://localhost:8080/api/clientes/{id}
+     * 
+     * @param id               O ID do cliente a ser atualizado, vindo da URL.
+     * @param dadosAtualizados O JSON com os novos dados do cliente, vindo do corpo
+     *                         da requisição.
+     * @return Uma resposta HTTP com o cliente atualizado (200 OK) ou um erro (404
+     *         Not Found).
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizarCliente(@PathVariable Integer id, @RequestBody Cliente dadosAtualizados) {
+        try {
+            Cliente clienteAtualizado = clienteService.atualizarCliente(id, dadosAtualizados);
+            return new ResponseEntity<>(clienteAtualizado, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            // Captura o erro do serviço se o cliente não for encontrado
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * Endpoint para deletar um cliente existente.
+     * URL: DELETE http://localhost:8080/api/clientes/{id}
+     * 
+     * @param id O ID do cliente a ser deletado.
+     * @return Uma resposta HTTP vazia com status 204 No Content (sucesso) ou um
+     *         erro (404 Not Found).
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarCliente(@PathVariable Integer id) {
+        try {
+            clienteService.deletarCliente(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (NoSuchElementException e) {
+            // Se o serviço não encontrar o cliente, retorna 404
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 }
