@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name = "pedidos_venda")
 @Data
@@ -46,5 +48,6 @@ public class PedidoVenda {
     // --- Itens do Pedido ---
     // Um pedido tem uma lista de itens. Se o pedido for deletado, os itens vão junto.
     @OneToMany(mappedBy = "pedidoVenda", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    
     private List<ItemPedidoVenda> itens;
 }
