@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
+import com.gestaowelinton.erp.dto.ClienteResponseDto;
+import java.util.NoSuchElementException;
+import com.gestaowelinton.erp.dto.AtualizarClienteDto;
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -66,8 +69,8 @@ public class ClienteController {
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarClientePorId(@PathVariable Integer id) {
         try {
-            Cliente cliente = clienteService.buscarClientePorId(id);
-            return new ResponseEntity<>(cliente, HttpStatus.OK);
+            ClienteResponseDto clienteDto = clienteService.buscarClientePorId(id);
+            return new ResponseEntity<>(clienteDto, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             // Captura a exceção que o serviço lança se o cliente não for encontrado
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -82,8 +85,8 @@ public class ClienteController {
      * @return Uma resposta HTTP com a lista de clientes (200 OK).
      */
     @GetMapping
-    public ResponseEntity<List<Cliente>> listarClientesPorEmpresa(@RequestParam(name = "idEmpresa") Long idEmpresa) {
-        List<Cliente> clientes = clienteService.listarClientesPorEmpresa(idEmpresa);
+    public ResponseEntity<List<ClienteResponseDto>> listarClientesPorEmpresa(@RequestParam(name = "idEmpresa") Long idEmpresa) {
+        List<ClienteResponseDto> clientes = clienteService.listarClientesPorEmpresa(idEmpresa);
         return new ResponseEntity<>(clientes, HttpStatus.OK);
     }
 
@@ -97,16 +100,16 @@ public class ClienteController {
      * @return Uma resposta HTTP com o cliente atualizado (200 OK) ou um erro (404
      *         Not Found).
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<?> atualizarCliente(@PathVariable Integer id, @RequestBody Cliente dadosAtualizados) {
-        try {
-            Cliente clienteAtualizado = clienteService.atualizarCliente(id, dadosAtualizados);
-            return new ResponseEntity<>(clienteAtualizado, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            // Captura o erro do serviço se o cliente não for encontrado
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+   @PutMapping("/{id}")
+public ResponseEntity<ClienteResponseDto> atualizarCliente(@PathVariable Integer id, @RequestBody AtualizarClienteDto dadosAtualizados) {
+    try {
+        Cliente clienteAtualizadoEntidade = clienteService.atualizarCliente(id, dadosAtualizados);
+        // Retornamos o DTO completo para o front-end ver o estado final do objeto
+        return new ResponseEntity<>(new ClienteResponseDto(clienteAtualizadoEntidade), HttpStatus.OK);
+    } catch (NoSuchElementException e) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+}
 
     /**
      * Endpoint para deletar um cliente existente.

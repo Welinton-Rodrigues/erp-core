@@ -1,5 +1,7 @@
 package com.gestaowelinton.erp.service;
 
+import com.gestaowelinton.erp.dto.AtualizarClienteDto;
+import com.gestaowelinton.erp.dto.ClienteResponseDto;
 import com.gestaowelinton.erp.model.Cliente;
 import com.gestaowelinton.erp.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.List;
 
 @Service
@@ -50,9 +53,11 @@ public class ClienteService {
  * @return Uma lista de Clientes. A lista pode estar vazia se não houver clientes.
  */
 @Transactional(readOnly = true)
-public List<Cliente> listarClientesPorEmpresa(Long idEmpresa) {
-    // Simplesmente chama o método que já criamos no repositório.
-    return clienteRepository.findByEmpresaIdEmpresa(idEmpresa);
+public List<ClienteResponseDto> listarClientesPorEmpresa(Long idEmpresa) {
+    return clienteRepository.findByEmpresaIdEmpresa(idEmpresa)
+            .stream()
+            .map(ClienteResponseDto::new)
+            .collect(Collectors.toList());
 }
 
     // Outros métodos virão aqui no futuro...
@@ -65,11 +70,11 @@ public List<Cliente> listarClientesPorEmpresa(Long idEmpresa) {
      */
 
 @Transactional(readOnly = true) // Opcional, mas boa prática para operações de leitura
-public Cliente buscarClientePorId(Integer id) {
+public ClienteResponseDto buscarClientePorId(Integer id) {
     return clienteRepository.findById(id)
+            .map(ClienteResponseDto::new) // Converte a entidade encontrada para o DTO
             .orElseThrow(() -> new NoSuchElementException("Cliente não encontrado com o ID: " + id));
-}// ... dentro da classe ClienteService
-
+}
 // ... outros métodos ...
 
 /**
@@ -79,21 +84,20 @@ public Cliente buscarClientePorId(Integer id) {
  * @return O cliente com os dados atualizados.
  * @throws NoSuchElementException se o cliente não for encontrado.
  */
-@Transactional
-public Cliente atualizarCliente(Integer id, Cliente dadosAtualizados) {
-    // 1. Busca o cliente existente no banco de dados.
-    //    Isso já lança NoSuchElementException se não encontrar, o que é perfeito.
-    Cliente clienteExistente = buscarClientePorId(id);
 
-    // 2. Atualiza os campos do cliente existente com os novos dados.
-    //    (Não atualizamos o CNPJ ou a empresa, pois geralmente são imutáveis)
-    clienteExistente.setNomeRazaoSocial(dadosAtualizados.getNomeRazaoSocial());
-    clienteExistente.setTipoCliente(dadosAtualizados.getTipoCliente());
-    clienteExistente.setTelefonePrincipal(dadosAtualizados.getTelefonePrincipal());
-    clienteExistente.setEmailPrincipal(dadosAtualizados.getEmailPrincipal());
+@Transactional
+public Cliente atualizarCliente(Integer id, AtualizarClienteDto dadosAtualizados) {
+    // Busca a entidade original do banco
+    Cliente clienteExistente = clienteRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Cliente não encontrado com o ID: " + id));
+
+    // Atualiza a entidade com os dados do DTO
+    clienteExistente.setNomeRazaoSocial(dadosAtualizados.nomeRazaoSocial());
+    clienteExistente.setTipoCliente(dadosAtualizados.tipoCliente());
+    clienteExistente.setTelefonePrincipal(dadosAtualizados.telefonePrincipal());
+    clienteExistente.setEmailPrincipal(dadosAtualizados.emailPrincipal());
     
-    // 3. Salva o cliente atualizado. O JpaRepository é inteligente e sabe
-    //    que, como o objeto já tem um ID, ele deve fazer um UPDATE em vez de um INSERT.
+    // Salva a entidade atualizada
     return clienteRepository.save(clienteExistente);
 }
 
