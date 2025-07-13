@@ -30,7 +30,7 @@ public class ContasReceber {
     private Cliente cliente; // Quem é o devedor
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_pedido_venda") // Pode ser nulo se a conta for avulsa
+    @JoinColumn(name = "id_pedido_venda") 
     private PedidoVenda pedidoVenda; // De qual venda originou esta conta
 
     // --- Dados Financeiros da Conta ---

@@ -23,14 +23,13 @@ public class PedidoVenda {
     @Column(name = "id_pedido_venda")
     private Long idPedidoVenda;
 
-    // --- Relacionamentos Fundamentais ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_empresa", nullable = false)
-    private Empresa empresa; // Garante o isolamento dos dados
+    private Empresa empresa; 
 
     // --- Dados do Pedido ---
     @Column(name = "data_pedido", nullable = false)
@@ -46,7 +45,6 @@ public class PedidoVenda {
     private String observacoes;
 
     // --- Itens do Pedido ---
-    // Um pedido tem uma lista de itens. Se o pedido for deletado, os itens vão junto.
     @OneToMany(mappedBy = "pedidoVenda", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     
     private List<ItemPedidoVenda> itens;

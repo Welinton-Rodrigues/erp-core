@@ -2,7 +2,7 @@ package com.gestaowelinton.erp.dto;
 
 import java.math.BigDecimal;
 
-// Este é o DTO que seu Controller está procurando.
+// Este record define os campos que a API pode receber para uma atualização.
 public record AtualizarProdutoDto(
     String nome,
     String codigoInterno,

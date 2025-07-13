@@ -10,10 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
 
-    // O Spring Data JPA cria a query automaticamente a partir do nome do método
-    // "Encontre um Cliente pelo seu campo cpfCnpj"
     Optional<Cliente> findByCpfCnpj(String cpfCnpj);
 
-    // "Encontre todos os Clientes que pertencem a uma Empresa, buscando pelo ID da empresa"
     List<Cliente> findByEmpresaIdEmpresa(Long idEmpresa);
 }

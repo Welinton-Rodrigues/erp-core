@@ -9,8 +9,6 @@ import java.util.List;
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
-    // Método para listar todos os produtos de uma empresa específica.
-    // O Spring Data JPA criará a query automaticamente.
     List<Produto> findByEmpresaIdEmpresa(Long idEmpresa);
 
 }

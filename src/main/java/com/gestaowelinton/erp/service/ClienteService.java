@@ -28,16 +28,13 @@ public class ClienteService {
      */
     @Transactional
     public Cliente criarCliente(Cliente cliente) {
-        // --- REGRA DE NEGÓCIO 1: Validar se o CPF/CNPJ já existe ---
         Optional<Cliente> clienteExistente = clienteRepository.findByCpfCnpj(cliente.getCpfCnpj());
 
         if (clienteExistente.isPresent()) {
-            // Se encontrou um cliente com o mesmo CPF/CNPJ, lança uma exceção.
             throw new IllegalStateException("CPF ou CNPJ já cadastrado no sistema.");
         }
 
         // --- REGRA DE NEGÓCIO 2: Garantir que o cliente pertence a uma empresa ---
-        // (Aqui a lógica para associar à empresa do usuário logado entraria no futuro)
         if (cliente.getEmpresa() == null) {
             throw new IllegalStateException("O cliente deve estar associado a uma empresa.");
         }
@@ -48,7 +45,6 @@ public class ClienteService {
 
 
 /**
- * Método para listar todos os clientes de uma empresa específica.
  * @param idEmpresa O ID da empresa da qual se quer listar os clientes.
  * @return Uma lista de Clientes. A lista pode estar vazia se não houver clientes.
  */
@@ -60,7 +56,6 @@ public List<ClienteResponseDto> listarClientesPorEmpresa(Long idEmpresa) {
             .collect(Collectors.toList());
 }
 
-    // Outros métodos virão aqui no futuro...
     /**
      * Busca um cliente pelo ID.
      * 
@@ -75,7 +70,6 @@ public ClienteResponseDto buscarClientePorId(Integer id) {
             .map(ClienteResponseDto::new) // Converte a entidade encontrada para o DTO
             .orElseThrow(() -> new NoSuchElementException("Cliente não encontrado com o ID: " + id));
 }
-// ... outros métodos ...
 
 /**
  * Atualiza os dados de um cliente existente.
@@ -87,7 +81,6 @@ public ClienteResponseDto buscarClientePorId(Integer id) {
 
 @Transactional
 public Cliente atualizarCliente(Integer id, AtualizarClienteDto dadosAtualizados) {
-    // Busca a entidade original do banco
     Cliente clienteExistente = clienteRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Cliente não encontrado com o ID: " + id));
 
@@ -101,9 +94,7 @@ public Cliente atualizarCliente(Integer id, AtualizarClienteDto dadosAtualizados
     return clienteRepository.save(clienteExistente);
 }
 
-// ... dentro da classe ClienteService
 
-// ... outros métodos ...
 
 /**
  * Deleta um cliente pelo seu ID.

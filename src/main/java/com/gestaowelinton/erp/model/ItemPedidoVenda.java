@@ -27,7 +27,7 @@ public class ItemPedidoVenda {
     private PedidoVenda pedidoVenda;
 
     // Relacionamento: O item se refere a UM Produto.
-    // ATENÇÃO: A classe 'Produto' ainda não existe, vamos criá-la em seguida.
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_produto", nullable = false)
     private Produto produto;

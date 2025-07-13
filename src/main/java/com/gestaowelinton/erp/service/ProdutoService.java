@@ -29,7 +29,6 @@ public class ProdutoService {
     }
 
     /**
-     * Busca um produto pelo seu ID.
      * @param id O ID do produto.
      * @return O produto encontrado.
      * @throws NoSuchElementException se o produto não for encontrado.
@@ -43,7 +42,6 @@ public class ProdutoService {
 
 
     /**
-     * Lista todos os produtos de uma empresa.
      * @param idEmpresa O ID da empresa.
      * @return Uma lista de produtos.
      */
@@ -53,12 +51,10 @@ public class ProdutoService {
     }
 
     /**
-     * Atualiza um produto existente.
      * @param id O ID do produto a ser atualizado.
      * @param dadosAtualizados Os novos dados do produto.
      * @return O produto atualizado.
      */
-   // Dentro da classe ProdutoService.java
 
 @Transactional
 public Produto atualizarProduto(Long id, AtualizarProdutoDto dadosAtualizados) {
@@ -66,7 +62,6 @@ public Produto atualizarProduto(Long id, AtualizarProdutoDto dadosAtualizados) {
             .orElseThrow(() -> new NoSuchElementException("Produto não encontrado com o ID: " + id));
 
     // Atualiza a entidade com os dados que vêm do DTO
-    // Note que para 'record', acessamos os campos como se fossem métodos: .nome()
     produtoExistente.setNome(dadosAtualizados.nome());
     produtoExistente.setCodigoInterno(dadosAtualizados.codigoInterno());
     produtoExistente.setUnidadeMedida(dadosAtualizados.unidadeMedida());
@@ -76,7 +71,6 @@ public Produto atualizarProduto(Long id, AtualizarProdutoDto dadosAtualizados) {
     return produtoRepository.save(produtoExistente);
 }
     /**
-     * Deleta um produto pelo seu ID.
      * @param id O ID do produto a ser deletado.
      */
     @Transactional

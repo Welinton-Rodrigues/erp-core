@@ -45,7 +45,6 @@ public class Produto {
     // O controle de estoque será feito em uma entidade separada 'Estoque' no futuro
     // para suportar múltiplos locais de armazenamento.
 
-    // Relacionamento inverso: Um produto pode estar em muitos itens de pedido
     @OneToMany(mappedBy = "produto") // Sem cascade! Não queremos deletar vendas se um produto for deletado.
     private List<ItemPedidoVenda> itensPedidoVenda;
 
