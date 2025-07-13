@@ -1,5 +1,6 @@
-package com.gestaowelinton.erp.dto;
+package com.gestaowelinton.erp.dto.ClienteDto;
 
+import com.gestaowelinton.erp.dto.FornecedorDto.EnderecoDto;
 import com.gestaowelinton.erp.model.Cliente;
 
 import java.time.LocalDate;

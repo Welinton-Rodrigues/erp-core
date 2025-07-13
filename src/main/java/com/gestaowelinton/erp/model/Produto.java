@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 @Entity
 @Table(name = "produtos")
 @Data
@@ -22,7 +20,6 @@ public class Produto {
     @Column(name = "id_produto")
     private Long idProduto;
 
-    // Todo produto pertence a UMA empresa
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_empresa", nullable = false)
     private Empresa empresa;
@@ -31,21 +28,25 @@ public class Produto {
     private String nome;
     
     @Column(name = "codigo_interno", length = 50)
-    private String codigoInterno; // Código/SKU usado pela empresa
+    private String codigoInterno; // Código "pai" do produto
 
     @Column(name = "unidade_medida", nullable = false, length = 10)
-    private String unidadeMedida; // Ex: "UN", "PC", "CX", "KG"
-
-    @Column(name = "preco_venda", precision = 10, scale = 2)
-    private BigDecimal precoVenda;
+    private String unidadeMedida; // Ex: "UN", "PC", "CX"
 
     @Column(name = "status", nullable = false, length = 20)
     private String status; // "ATIVO" ou "INATIVO"
 
-    // O controle de estoque será feito em uma entidade separada 'Estoque' no futuro
-    // para suportar múltiplos locais de armazenamento.
+    // --- CAMPOS REMOVIDOS ---
+    // O 'precoVenda' e 'quantidadeEstoque' foram movidos para a entidade VariacaoProduto.
 
-    @OneToMany(mappedBy = "produto") // Sem cascade! Não queremos deletar vendas se um produto for deletado.
-    private List<ItemPedidoVenda> itensPedidoVenda;
+    // --- NOVA RELAÇÃO ---
+    // Um Produto agora tem uma lista de Variações.
+    // CascadeType.ALL: Se um produto for deletado, suas variações vão junto.
+    // orphanRemoval = true: Se uma variação for removida da lista, ela é deletada do banco.
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<VariacaoProduto> variacoes;
 
+    // A relação com ItemPedidoVenda continua, mas precisaremos ajustá-la depois.
+   // @OneToMany(mappedBy = "produto")
+   // private List<ItemPedidoVenda> itensPedidoVenda;
 }

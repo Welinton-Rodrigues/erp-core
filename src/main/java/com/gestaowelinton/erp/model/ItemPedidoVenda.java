@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 @Entity
 @Table(name = "itens_pedido_venda")
 @Data
@@ -21,23 +19,26 @@ public class ItemPedidoVenda {
     @Column(name = "id_item_pedido_venda")
     private Long idItemPedidoVenda;
 
-    // Relacionamento: O item pertence a UM Pedido de Venda.
+    // A relação com o Pedido "pai" continua a mesma
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_pedido_venda", nullable = false)
     private PedidoVenda pedidoVenda;
 
-    // Relacionamento: O item se refere a UM Produto.
-
+    // --- MUDANÇA CRÍTICA AQUI ---
+    // Removemos a ligação com Produto e agora ligamos com a Variação específica.
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_produto", nullable = false)
-    private Produto produto;
+    @JoinColumn(name = "id_variacao_produto", nullable = false)
+    private VariacaoProduto variacaoProduto;
+    // ----------------------------
 
     @Column(nullable = false, precision = 10, scale = 3)
     private BigDecimal quantidade;
 
     @Column(name = "preco_unitario", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precoUnitario; // Preço no momento da venda
+    private BigDecimal precoUnitario;
 
     @Column(name = "valor_total", nullable = false, precision = 10, scale = 2)
-    private BigDecimal valorTotal; // quantidade * preco_unitario
+    private BigDecimal valorTotal;
+    
+    // O campo 'produto' foi removido, pois agora podemos acessá-lo através da variacaoProduto.getProduto()
 }

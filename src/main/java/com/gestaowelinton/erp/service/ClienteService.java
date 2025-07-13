@@ -1,7 +1,7 @@
 package com.gestaowelinton.erp.service;
 
-import com.gestaowelinton.erp.dto.AtualizarClienteDto;
-import com.gestaowelinton.erp.dto.ClienteResponseDto;
+import com.gestaowelinton.erp.dto.ClienteDto.AtualizarClienteDto;
+import com.gestaowelinton.erp.dto.ClienteDto.ClienteResponseDto;
 import com.gestaowelinton.erp.model.Cliente;
 import com.gestaowelinton.erp.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,8 @@
 package com.gestaowelinton.erp.service;
 
-import com.gestaowelinton.erp.dto.AtualizarFornecedorDto;
-import com.gestaowelinton.erp.dto.CriarFornecedorDto;
-import com.gestaowelinton.erp.dto.FornecedorResponseDto;
+import com.gestaowelinton.erp.dto.FornecedorDto.AtualizarFornecedorDto;
+import com.gestaowelinton.erp.dto.FornecedorDto.CriarFornecedorDto;
+import com.gestaowelinton.erp.dto.FornecedorDto.FornecedorResponseDto;
 import com.gestaowelinton.erp.model.Empresa;
 import com.gestaowelinton.erp.model.Fornecedor;
 import com.gestaowelinton.erp.repository.EmpresaRepository;

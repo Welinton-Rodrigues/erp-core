@@ -1,4 +1,4 @@
-package com.gestaowelinton.erp.dto;
+package com.gestaowelinton.erp.dto.ClienteDto;
 
 import java.math.BigDecimal; // Embora não usemos BigDecimal aqui, é bom ter como referência
 
