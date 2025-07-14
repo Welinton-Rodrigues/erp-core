@@ -89,5 +89,8 @@ public void deletarProduto(Long id) {
     //    O CascadeType.ALL se encarrega de deletar todas as "VariacaoProduto" filhas automaticamente.
     produtoRepository.deleteById(id);
 }
+
+
+
   
 }

@@ -2,6 +2,7 @@ package com.gestaowelinton.erp.service;
 
 import com.gestaowelinton.erp.dto.pedido.CriarPedidoVendaRequestDto;
 import com.gestaowelinton.erp.dto.pedido.ItemPedidoVendaRequestDto;
+import com.gestaowelinton.erp.dto.pedido.PedidoVendaResponseDto;
 import com.gestaowelinton.erp.model.*;
 import com.gestaowelinton.erp.repository.ClienteRepository;
 import com.gestaowelinton.erp.repository.PedidoVendaRepository;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoVendaService {
@@ -79,5 +81,80 @@ public class PedidoVendaService {
         novoPedido.setValorTotal(valorTotalPedido);
         
         return pedidoVendaRepository.save(novoPedido);
+    }
+
+    /**
+     * Busca um pedido de venda pelo seu ID e o converte para DTO.
+     * @param id O ID do pedido.
+     * @return Um DTO com os detalhes do pedido.
+     * @throws NoSuchElementException se o pedido não for encontrado.
+     */
+    @Transactional(readOnly = true)
+    public PedidoVendaResponseDto buscarPedidoPorId(Long id) {
+        // 1. Busca a entidade no banco
+        PedidoVenda pedido = pedidoVendaRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Pedido de Venda não encontrado com o ID: " + id));
+        
+        // 2. Converte a entidade para o DTO de resposta e retorna
+        return new PedidoVendaResponseDto(pedido);
+    }
+
+    /**
+     * Lista todos os pedidos de uma empresa e os converte para DTO.
+     * @param idEmpresa O ID da empresa.
+     * @return Uma lista de DTOs com o resumo dos pedidos.
+     */
+    @Transactional(readOnly = true)
+    public List<PedidoVendaResponseDto> listarPedidosPorEmpresa(Long idEmpresa) {
+        // 1. Busca a lista de entidades no banco usando o novo método do repositório
+        List<PedidoVenda> pedidos = pedidoVendaRepository.findByEmpresaIdEmpresa(idEmpresa);
+
+        // 2. Converte cada entidade da lista para seu DTO correspondente
+        return pedidos.stream()
+                      .map(PedidoVendaResponseDto::new)
+                      .collect(Collectors.toList());
+    }
+
+    // Dentro da classe PedidoVendaService.java
+
+// ... outros métodos ...
+
+    /**
+     * Cancela um pedido de venda, alterando seu status e estornando o estoque dos itens.
+     * @param id O ID do pedido a ser cancelado.
+     * @return O DTO do pedido com o status atualizado para "CANCELADO".
+     * @throws NoSuchElementException se o pedido não for encontrado.
+     * @throws IllegalStateException se o pedido não puder ser cancelado (ex: já foi cancelado ou faturado).
+     */
+    @Transactional
+    public PedidoVendaResponseDto cancelarPedido(Long id) {
+        // 1. Busca o pedido no banco, incluindo seus itens e variações.
+        PedidoVenda pedido = pedidoVendaRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Pedido de Venda não encontrado com o ID: " + id));
+
+        // 2. REGRA DE NEGÓCIO: Só podemos cancelar um pedido que foi "EMITIDO".
+        if (!"EMITIDO".equals(pedido.getStatus())) {
+            throw new IllegalStateException("Apenas pedidos com status 'EMITIDO' podem ser cancelados. Status atual: " + pedido.getStatus());
+        }
+
+        // 3. Altera o status do pedido.
+        pedido.setStatus("CANCELADO");
+
+        // 4. REGRA DE NEGÓCIO: Estorna (devolve) os itens para o estoque.
+        for (ItemPedidoVenda item : pedido.getItens()) {
+            VariacaoProduto variacao = item.getVariacaoProduto();
+            int quantidadeEstornada = item.getQuantidade().intValue();
+            
+            // Adiciona a quantidade de volta ao estoque da variação
+            variacao.setQuantidadeEstoque(variacao.getQuantidadeEstoque() + quantidadeEstornada);
+            // O repositório não precisa ser chamado aqui para a variação, pois o Hibernate gerencia
+            // o estado do objeto dentro de uma transação @Transactional.
+        }
+
+        // 5. Salva o pedido com o novo status. O Hibernate salvará as alterações nas variações também.
+        PedidoVenda pedidoCancelado = pedidoVendaRepository.save(pedido);
+
+        // 6. Retorna o DTO do pedido atualizado.
+        return new PedidoVendaResponseDto(pedidoCancelado);
     }
 }

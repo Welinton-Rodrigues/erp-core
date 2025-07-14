@@ -36,13 +36,7 @@ public class Produto {
     @Column(name = "status", nullable = false, length = 20)
     private String status; // "ATIVO" ou "INATIVO"
 
-    // --- CAMPOS REMOVIDOS ---
-    // O 'precoVenda' e 'quantidadeEstoque' foram movidos para a entidade VariacaoProduto.
-
-    // --- NOVA RELAÇÃO ---
-    // Um Produto agora tem uma lista de Variações.
-    // CascadeType.ALL: Se um produto for deletado, suas variações vão junto.
-    // orphanRemoval = true: Se uma variação for removida da lista, ela é deletada do banco.
+  
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<VariacaoProduto> variacoes;
 

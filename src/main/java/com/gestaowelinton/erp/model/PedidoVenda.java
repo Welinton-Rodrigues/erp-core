@@ -3,6 +3,7 @@ package com.gestaowelinton.erp.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Entity
 @Table(name = "pedidos_venda")
 @Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PedidoVenda {
@@ -46,6 +48,8 @@ public class PedidoVenda {
 
     // --- Itens do Pedido ---
     @OneToMany(mappedBy = "pedidoVenda", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    
     private List<ItemPedidoVenda> itens;
+
+    @Column(name = "formaPagamento", length = 50)
+    private String formaPagamento; // Ex: "DINHEIRO", "CARTÃO", "BOLETO"
 }

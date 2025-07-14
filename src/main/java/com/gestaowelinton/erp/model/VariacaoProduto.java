@@ -30,7 +30,7 @@ public class VariacaoProduto {
     @Column(length = 20)
     private String tamanho;
 
-    @Column(name = "codigo_barras", length = 50, unique = true) // O ideal é que cada variação tenha um código único
+    @Column(name = "codigo_barras", length = 50, unique = true) 
     private String codigoBarras;
 
     @Column(name = "preco_venda", precision = 10, scale = 2)
