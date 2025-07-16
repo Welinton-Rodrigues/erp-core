@@ -75,4 +75,17 @@ public class PedidoVendaController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+     // --- Endpoint para FATURAR um pedido ---
+    @PutMapping("/{id}/faturar")
+    public ResponseEntity<?> faturarPedido(@PathVariable Long id) {
+        try {
+            PedidoVendaResponseDto pedidoFaturado = pedidoVendaService.faturarPedido(id);
+            return new ResponseEntity<>(pedidoFaturado, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

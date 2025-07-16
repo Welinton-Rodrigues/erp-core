@@ -10,13 +10,13 @@ import com.gestaowelinton.erp.repository.VariacaoProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+import com.gestaowelinton.erp.repository.ContasReceberRepository;
 
 @Service
 public class PedidoVendaService {
@@ -26,6 +26,9 @@ public class PedidoVendaService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+     @Autowired
+    private ContasReceberRepository contasReceberRepository;
 
     @Autowired
     private VariacaoProdutoRepository variacaoProdutoRepository;
@@ -147,8 +150,7 @@ public class PedidoVendaService {
             
             // Adiciona a quantidade de volta ao estoque da variação
             variacao.setQuantidadeEstoque(variacao.getQuantidadeEstoque() + quantidadeEstornada);
-            // O repositório não precisa ser chamado aqui para a variação, pois o Hibernate gerencia
-            // o estado do objeto dentro de uma transação @Transactional.
+    
         }
 
         // 5. Salva o pedido com o novo status. O Hibernate salvará as alterações nas variações também.
@@ -157,4 +159,46 @@ public class PedidoVendaService {
         // 6. Retorna o DTO do pedido atualizado.
         return new PedidoVendaResponseDto(pedidoCancelado);
     }
+
+    /**
+     * Fatura um pedido de venda, alterando seu status e gerando a conta a receber.
+     * @param id O ID do pedido a ser faturado.
+     * @return O DTO do pedido com o status atualizado para "FATURADO".
+     */
+    @Transactional
+    public PedidoVendaResponseDto faturarPedido(Long id) {
+        // 1. Busca o pedido no banco.
+        PedidoVenda pedido = pedidoVendaRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Pedido de Venda não encontrado com o ID: " + id));
+
+        // 2. REGRA DE NEGÓCIO: Só podemos faturar um pedido que foi "EMITIDO".
+        if (!"EMITIDO".equals(pedido.getStatus())) {
+            throw new IllegalStateException("Apenas pedidos com status 'EMITIDO' podem ser faturados. Status atual: " + pedido.getStatus());
+        }
+
+        // 3. Altera o status do pedido.
+        pedido.setStatus("FATURADO");
+
+        // 4. REGRA DE NEGÓCIO: Cria o registro financeiro correspondente.
+        ContasReceber novaConta = new ContasReceber();
+        novaConta.setEmpresa(pedido.getEmpresa());
+        novaConta.setCliente(pedido.getCliente());
+        novaConta.setPedidoVenda(pedido);
+        novaConta.setDescricao("Recebimento referente à Venda #" + pedido.getIdPedidoVenda());
+        novaConta.setValor(pedido.getValorTotal());
+        novaConta.setDataVencimento(LocalDate.now().plusDays(1)); // Simula o D+1 do recebimento da maquininha
+        novaConta.setStatus("A RECEBER");
+        
+        // 5. Salva a nova conta a receber no banco de dados.
+        contasReceberRepository.save(novaConta);
+
+        // 6. Salva o pedido com o novo status.
+        PedidoVenda pedidoFaturado = pedidoVendaRepository.save(pedido);
+
+        // 7. Retorna o DTO do pedido atualizado.
+        return new PedidoVendaResponseDto(pedidoFaturado);
+    }
+
+
+    
 }
