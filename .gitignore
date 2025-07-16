@@ -34,3 +34,5 @@ build/
 
 # Arquivos de configuração locais - NÃO COMMITAR!
 application-local.properties
+
+src/main/resources/application-dev.properties
