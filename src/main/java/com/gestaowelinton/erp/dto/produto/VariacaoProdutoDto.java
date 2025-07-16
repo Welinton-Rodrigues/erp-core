@@ -1,4 +1,4 @@
-package com.gestaowelinton.erp.dto.ProdutoDto;
+package com.gestaowelinton.erp.dto.produto;
 
 import com.gestaowelinton.erp.model.VariacaoProduto;
 

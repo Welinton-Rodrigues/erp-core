@@ -1,4 +1,4 @@
-package com.gestaowelinton.erp.dto.ClienteDto;
+package com.gestaowelinton.erp.dto.cliente;
 
 import com.gestaowelinton.erp.model.ContatosCliente;
 

@@ -1,7 +1,7 @@
 package com.gestaowelinton.erp.service;
 
-import com.gestaowelinton.erp.dto.ClienteDto.AtualizarClienteDto;
-import com.gestaowelinton.erp.dto.ClienteDto.ClienteResponseDto;
+import com.gestaowelinton.erp.dto.cliente.AtualizarClienteDto;
+import com.gestaowelinton.erp.dto.cliente.ClienteResponseDto;
 import com.gestaowelinton.erp.model.Cliente;
 import com.gestaowelinton.erp.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +84,6 @@ public Cliente atualizarCliente(Integer id, AtualizarClienteDto dadosAtualizados
     Cliente clienteExistente = clienteRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Cliente não encontrado com o ID: " + id));
 
-    // Atualiza a entidade com os dados do DTO
     clienteExistente.setNomeRazaoSocial(dadosAtualizados.nomeRazaoSocial());
     clienteExistente.setTipoCliente(dadosAtualizados.tipoCliente());
     clienteExistente.setTelefonePrincipal(dadosAtualizados.telefonePrincipal());
@@ -104,16 +103,12 @@ public Cliente atualizarCliente(Integer id, AtualizarClienteDto dadosAtualizados
 @Transactional
 public void deletarCliente(Integer id) {
     // 1. Verifica se o cliente existe antes de tentar deletar.
-    //    Se não existir, o findById já lança a exceção para nós.
     if (!clienteRepository.existsById(id)) {
         throw new NoSuchElementException("Cliente não encontrado com o ID: " + id);
     }
     
-    // 2. Se o cliente existe, deleta.
     clienteRepository.deleteById(id);
 }
 
-    // public List<Cliente> listarClientesPorEmpresa(Long idEmpresa) { ... }
-    // public Cliente atualizarCliente(Integer id, Cliente cliente) { ... }
-    // public void deletarCliente(Integer id) { ... }
+   
 }

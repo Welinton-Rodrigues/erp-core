@@ -1,8 +1,8 @@
 package com.gestaowelinton.erp.controller;
 
-import com.gestaowelinton.erp.dto.FornecedorDto.AtualizarFornecedorDto;
-import com.gestaowelinton.erp.dto.FornecedorDto.CriarFornecedorDto;
-import com.gestaowelinton.erp.dto.FornecedorDto.FornecedorResponseDto;
+import com.gestaowelinton.erp.dto.fornecedor.AtualizarFornecedorDto;
+import com.gestaowelinton.erp.dto.fornecedor.CriarFornecedorDto;
+import com.gestaowelinton.erp.dto.fornecedor.FornecedorResponseDto;
 import com.gestaowelinton.erp.service.FornecedorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

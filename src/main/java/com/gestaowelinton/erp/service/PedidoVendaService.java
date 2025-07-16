@@ -33,57 +33,85 @@ public class PedidoVendaService {
     @Autowired
     private VariacaoProdutoRepository variacaoProdutoRepository;
 
-    @Transactional // ESSENCIAL: Garante que ou tudo funciona, ou nada é salvo.
+   // Dentro da classe PedidoVendaService.java
+
+    @Transactional
     public PedidoVenda criarPedido(CriarPedidoVendaRequestDto pedidoDto) {
-        // 1. Validar e buscar o Cliente
+        // 1. Validações iniciais (continuam as mesmas)
         Cliente cliente = clienteRepository.findById(pedidoDto.idCliente())
                 .orElseThrow(() -> new NoSuchElementException("Cliente não encontrado com o ID: " + pedidoDto.idCliente()));
 
         // 2. Preparar o Pedido de Venda "pai"
         PedidoVenda novoPedido = new PedidoVenda();
         novoPedido.setCliente(cliente);
-        novoPedido.setEmpresa(cliente.getEmpresa()); // Pega a empresa do cliente
+        novoPedido.setEmpresa(cliente.getEmpresa());
         novoPedido.setDataPedido(LocalDate.now());
-        novoPedido.setStatus("EMITIDO");
+        novoPedido.setFormaPagamento(pedidoDto.formaPagamento()); // <-- Importante
         novoPedido.setObservacoes(pedidoDto.observacoes());
         novoPedido.setItens(new ArrayList<>());
 
         BigDecimal valorTotalPedido = BigDecimal.ZERO;
 
-        // 3. Processar cada item do pedido
+        // 3. Processar itens e dar baixa no estoque (continua o mesmo)
         for (ItemPedidoVendaRequestDto itemDto : pedidoDto.itens()) {
-            // 3.1. Buscar a variação do produto no banco
             VariacaoProduto variacao = variacaoProdutoRepository.findById(itemDto.idVariacaoProduto())
                     .orElseThrow(() -> new NoSuchElementException("Variação de produto não encontrada com o ID: " + itemDto.idVariacaoProduto()));
 
-            // 3.2. REGRA DE NEGÓCIO: Verificar estoque
             if (variacao.getQuantidadeEstoque() < itemDto.quantidade().intValue()) {
-                throw new IllegalStateException("Estoque insuficiente para o produto: " + variacao.getProduto().getNome() + " (Cor: " + variacao.getCor() + ", Tamanho: " + variacao.getTamanho() + ")");
+                throw new IllegalStateException("Estoque insuficiente para o produto: " + variacao.getProduto().getNome());
             }
 
-            // 3.3. Criar a entidade ItemPedidoVenda
             ItemPedidoVenda novoItem = new ItemPedidoVenda();
-            novoItem.setPedidoVenda(novoPedido); // Linka o item com o pedido pai
+            novoItem.setPedidoVenda(novoPedido);
+
             novoItem.setVariacaoProduto(variacao);
             novoItem.setQuantidade(itemDto.quantidade());
-            novoItem.setPrecoUnitario(variacao.getPrecoVenda()); // Pega o preço do banco, não do front-end!
+            novoItem.setPrecoUnitario(variacao.getPrecoVenda());
             novoItem.setValorTotal(variacao.getPrecoVenda().multiply(itemDto.quantidade()));
-
-            // 3.4. Adicionar o item à lista do pedido
+            
             novoPedido.getItens().add(novoItem);
 
-            // 3.5. REGRA DE NEGÓCIO: Dar baixa no estoque
             variacao.setQuantidadeEstoque(variacao.getQuantidadeEstoque() - itemDto.quantidade().intValue());
-            variacaoProdutoRepository.save(variacao); // Salva a alteração do estoque
+            // O save da variação acontece no final da transação pelo Hibernate
 
-            // 3.6. Atualizar o valor total do pedido
             valorTotalPedido = valorTotalPedido.add(novoItem.getValorTotal());
         }
 
-        // 4. Finalizar e salvar o pedido
         novoPedido.setValorTotal(valorTotalPedido);
-        
-        return pedidoVendaRepository.save(novoPedido);
+
+        // --- NOVA LÓGICA DE NEGÓCIO AQUI ---
+        // 4. Decidir o que fazer com base na forma de pagamento
+        boolean pagamentoImediato = "PIX".equalsIgnoreCase(pedidoDto.formaPagamento()) ||
+                                    "DINHEIRO".equalsIgnoreCase(pedidoDto.formaPagamento()) ||
+                                    "CARTÃO DE DÉBITO".equalsIgnoreCase(pedidoDto.formaPagamento());
+
+        if (pagamentoImediato) {
+            // Se o pagamento é na hora, já concluímos tudo
+            novoPedido.setStatus("CONCLUÍDO");
+            
+            ContasReceber contaPaga = new ContasReceber();
+            contaPaga.setEmpresa(novoPedido.getEmpresa());
+            contaPaga.setCliente(novoPedido.getCliente());
+            contaPaga.setPedidoVenda(novoPedido);
+            contaPaga.setDescricao("Recebimento da Venda #" + novoPedido.getIdPedidoVenda()); // O ID será preenchido no save
+            contaPaga.setValor(novoPedido.getValorTotal());
+            contaPaga.setDataVencimento(LocalDate.now());
+            contaPaga.setDataRecebimento(LocalDate.now()); // Já foi recebido!
+            contaPaga.setStatus("PAGO");
+            
+            // Primeiro salvamos o pedido para que ele tenha um ID
+            PedidoVenda pedidoSalvo = pedidoVendaRepository.save(novoPedido);
+            // Associamos a conta ao pedido salvo e salvamos a conta
+            contaPaga.setDescricao("Recebimento da Venda #" + pedidoSalvo.getIdPedidoVenda());
+            contasReceberRepository.save(contaPaga);
+            
+            return pedidoSalvo;
+
+        } else {
+            // Se for a prazo (Boleto, Faturado, etc.), o pedido fica pendente de faturamento
+            novoPedido.setStatus("EMITIDO");
+            return pedidoVendaRepository.save(novoPedido);
+        }
     }
 
     /**
@@ -195,7 +223,6 @@ public class PedidoVendaService {
         // 6. Salva o pedido com o novo status.
         PedidoVenda pedidoFaturado = pedidoVendaRepository.save(pedido);
 
-        // 7. Retorna o DTO do pedido atualizado.
         return new PedidoVendaResponseDto(pedidoFaturado);
     }
 

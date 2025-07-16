@@ -1,5 +1,7 @@
 package com.gestaowelinton.erp.controller;
 
+import com.gestaowelinton.erp.dto.cliente.AtualizarClienteDto;
+import com.gestaowelinton.erp.dto.cliente.ClienteResponseDto;
 import com.gestaowelinton.erp.model.Cliente;
 import com.gestaowelinton.erp.service.ClienteService;
 
@@ -18,10 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
-
-import com.gestaowelinton.erp.dto.ClienteDto.AtualizarClienteDto;
-import com.gestaowelinton.erp.dto.ClienteDto.ClienteResponseDto;
-
 import java.util.NoSuchElementException;
 
 @RestController

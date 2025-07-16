@@ -1,4 +1,4 @@
-package com.gestaowelinton.erp.dto.FornecedorDto;
+package com.gestaowelinton.erp.dto.fornecedor;
 
 public record AtualizarFornecedorDto(
     String nomeRazaoSocial,

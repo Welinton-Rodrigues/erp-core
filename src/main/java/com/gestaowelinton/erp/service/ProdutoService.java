@@ -1,8 +1,8 @@
 package com.gestaowelinton.erp.service;
 
-import com.gestaowelinton.erp.dto.ProdutoDto.ProdutoResponseDto;
-import com.gestaowelinton.erp.dto.ProdutoDto.CriarProdutoDto;
-import com.gestaowelinton.erp.dto.ProdutoDto.VariacaoProdutoDto;
+import com.gestaowelinton.erp.dto.produto.CriarProdutoDto;
+import com.gestaowelinton.erp.dto.produto.ProdutoResponseDto;
+import com.gestaowelinton.erp.dto.produto.VariacaoProdutoDto;
 import com.gestaowelinton.erp.model.Empresa;
 import com.gestaowelinton.erp.model.Produto;
 import com.gestaowelinton.erp.model.VariacaoProduto;

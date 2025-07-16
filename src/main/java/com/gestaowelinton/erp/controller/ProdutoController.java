@@ -1,7 +1,7 @@
 package com.gestaowelinton.erp.controller;
 
-import com.gestaowelinton.erp.dto.ProdutoDto.ProdutoResponseDto;
-import com.gestaowelinton.erp.dto.ProdutoDto.CriarProdutoDto;
+import com.gestaowelinton.erp.dto.produto.CriarProdutoDto;
+import com.gestaowelinton.erp.dto.produto.ProdutoResponseDto;
 // Remova os imports dos DTOs de atualização antigos
 import com.gestaowelinton.erp.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;

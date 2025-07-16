@@ -1,4 +1,4 @@
-package com.gestaowelinton.erp.dto.FornecedorDto;
+package com.gestaowelinton.erp.dto.fornecedor;
 
 import com.gestaowelinton.erp.model.EnderecosCliente;
 
