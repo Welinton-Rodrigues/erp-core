@@ -26,11 +26,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UsuarioRepository usuarioRepository;
-    // --- MUDANÇA 1: REMOVEMOS O FILTRO DAQUI ---
-    // private final JwtAuthenticationFilter jwtAuthFilter;
 
     @Bean
-    // --- MUDANÇA 2: ADICIONAMOS O FILTRO COMO PARÂMETRO AQUI ---
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -46,7 +43,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ... o resto da classe continua igual ...
 
     @Bean
     public UserDetailsService userDetailsService() {

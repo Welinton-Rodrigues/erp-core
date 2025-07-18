@@ -1,6 +1,6 @@
 package com.gestaowelinton.erp.security.model;
 
-import com.gestaowelinton.erp.model.Empresa; // Lembre de importar a classe Empresa
+import com.gestaowelinton.erp.model.Empresa; 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,7 +32,7 @@ public class Usuario implements UserDetails {
     private String nome;
 
     @Column(nullable = false, unique = true, length = 100)
-    private String email; // Usaremos o email como username
+    private String email; 
 
     @Column(name = "senha", nullable = false)
     private String senha;

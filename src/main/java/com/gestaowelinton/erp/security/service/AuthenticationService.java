@@ -31,8 +31,7 @@ public class AuthenticationService {
 
     public AuthResponseDto login(AuthRequestDto request) {
         // 1. O AuthenticationManager usa o nosso 'AuthenticationProvider' para validar
-        // o usuário e senha.
-        // Se as credenciais estiverem erradas, ele lança uma exceção aqui.
+      
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.senha()));
 
