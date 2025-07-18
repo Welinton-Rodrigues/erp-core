@@ -2,6 +2,7 @@ package com.gestaowelinton.erp.service;
 
 import com.gestaowelinton.erp.dto.compra.CriarPedidoCompraRequestDto;
 import com.gestaowelinton.erp.dto.compra.ItemPedidoCompraRequestDto;
+import com.gestaowelinton.erp.dto.compra.PedidoCompraResponseDto;
 import com.gestaowelinton.erp.model.*;
 import com.gestaowelinton.erp.repository.FornecedorRepository;
 import com.gestaowelinton.erp.repository.PedidoCompraRepository;
@@ -70,5 +71,41 @@ public class PedidoCompraService {
 
         // O CascadeType.ALL salvará o pedido e todos os seus itens de uma vez.
         return pedidoCompraRepository.save(novoPedido);
+    }
+
+     /**
+     * Marca um pedido de compra como "RECEBIDO" e atualiza o estoque dos produtos.
+     * @param id O ID do pedido de compra.
+     * @return O DTO do pedido atualizado.
+     */
+    @Transactional
+    public PedidoCompraResponseDto receberPedido(Long id) {
+        // 1. Busca o pedido de compra no banco.
+        PedidoCompra pedido = pedidoCompraRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Pedido de Compra não encontrado com o ID: " + id));
+
+        // 2. REGRA DE NEGÓCIO: Só podemos receber um pedido que foi "SOLICITADO".
+        if (!"SOLICITADO".equals(pedido.getStatus())) {
+            throw new IllegalStateException("Apenas pedidos com status 'SOLICITADO' podem ser recebidos. Status atual: " + pedido.getStatus());
+        }
+
+        // 3. Altera o status do pedido.
+        pedido.setStatus("RECEBIDO");
+
+        // 4. REGRA DE NEGÓCIO: Adiciona os itens ao estoque.
+        for (ItemPedidoCompra item : pedido.getItens()) {
+            VariacaoProduto variacao = item.getVariacaoProduto();
+            int quantidadeRecebida = item.getQuantidade().intValue();
+            
+            // Adiciona a quantidade ao estoque da variação
+            variacao.setQuantidadeEstoque(variacao.getQuantidadeEstoque() + quantidadeRecebida);
+        }
+
+        // 5. Salva o pedido. O @Transactional garante que as alterações no estoque
+        //    das variações também serão salvas.
+        PedidoCompra pedidoRecebido = pedidoCompraRepository.save(pedido);
+
+        // 6. Retorna o DTO do pedido atualizado.
+        return new PedidoCompraResponseDto(pedidoRecebido);
     }
 }
