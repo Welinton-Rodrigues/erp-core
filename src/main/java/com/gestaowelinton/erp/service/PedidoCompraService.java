@@ -15,9 +15,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+import com.gestaowelinton.erp.dto.financeiro.CriarContaPagarDto; // Adicione este import
 
 @Service
 public class PedidoCompraService {
+
+    @Autowired
+    private ContasPagarService contasPagarService;
 
     @Autowired
     private PedidoCompraRepository pedidoCompraRepository;
@@ -32,7 +36,8 @@ public class PedidoCompraService {
     public PedidoCompra criarPedido(CriarPedidoCompraRequestDto dto) {
         // 1. Validar e buscar o Fornecedor.
         Fornecedor fornecedor = fornecedorRepository.findById(dto.idFornecedor())
-                .orElseThrow(() -> new NoSuchElementException("Fornecedor não encontrado com o ID: " + dto.idFornecedor()));
+                .orElseThrow(
+                        () -> new NoSuchElementException("Fornecedor não encontrado com o ID: " + dto.idFornecedor()));
 
         // 2. Preparar o Pedido de Compra "pai".
         PedidoCompra novoPedido = new PedidoCompra();
@@ -48,20 +53,21 @@ public class PedidoCompraService {
         // 3. Processar cada item do pedido.
         for (ItemPedidoCompraRequestDto itemDto : dto.itens()) {
             VariacaoProduto variacao = variacaoProdutoRepository.findById(itemDto.idVariacaoProduto())
-                    .orElseThrow(() -> new NoSuchElementException("Variação de produto não encontrada com o ID: " + itemDto.idVariacaoProduto()));
+                    .orElseThrow(() -> new NoSuchElementException(
+                            "Variação de produto não encontrada com o ID: " + itemDto.idVariacaoProduto()));
 
             ItemPedidoCompra novoItem = new ItemPedidoCompra();
             novoItem.setPedidoCompra(novoPedido); // Link reverso para o "pai"
             novoItem.setVariacaoProduto(variacao);
             novoItem.setQuantidade(itemDto.quantidade());
             novoItem.setPrecoCusto(itemDto.precoCusto());
-            
+
             // Calcula o total do item
             BigDecimal valorTotalItem = itemDto.precoCusto().multiply(itemDto.quantidade());
             novoItem.setValorTotal(valorTotalItem);
-            
+
             novoPedido.getItens().add(novoItem);
-            
+
             // Soma o valor do item ao total do pedido
             valorTotalPedido = valorTotalPedido.add(valorTotalItem);
         }
@@ -73,39 +79,49 @@ public class PedidoCompraService {
         return pedidoCompraRepository.save(novoPedido);
     }
 
-     /**
+    /**
      * Marca um pedido de compra como "RECEBIDO" e atualiza o estoque dos produtos.
+     * 
      * @param id O ID do pedido de compra.
      * @return O DTO do pedido atualizado.
      */
-    @Transactional
-    public PedidoCompraResponseDto receberPedido(Long id) {
-        // 1. Busca o pedido de compra no banco.
-        PedidoCompra pedido = pedidoCompraRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Pedido de Compra não encontrado com o ID: " + id));
+   // Dentro da classe PedidoCompraService.java
 
-        // 2. REGRA DE NEGÓCIO: Só podemos receber um pedido que foi "SOLICITADO".
-        if (!"SOLICITADO".equals(pedido.getStatus())) {
-            throw new IllegalStateException("Apenas pedidos com status 'SOLICITADO' podem ser recebidos. Status atual: " + pedido.getStatus());
-        }
+@Transactional
+public PedidoCompraResponseDto receberPedido(Long id) {
+    // 1. Busca o pedido de compra (lógica existente).
+    PedidoCompra pedido = pedidoCompraRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Pedido de Compra não encontrado com o ID: " + id));
 
-        // 3. Altera o status do pedido.
-        pedido.setStatus("RECEBIDO");
-
-        // 4. REGRA DE NEGÓCIO: Adiciona os itens ao estoque.
-        for (ItemPedidoCompra item : pedido.getItens()) {
-            VariacaoProduto variacao = item.getVariacaoProduto();
-            int quantidadeRecebida = item.getQuantidade().intValue();
-            
-            // Adiciona a quantidade ao estoque da variação
-            variacao.setQuantidadeEstoque(variacao.getQuantidadeEstoque() + quantidadeRecebida);
-        }
-
-        // 5. Salva o pedido. O @Transactional garante que as alterações no estoque
-        //    das variações também serão salvas.
-        PedidoCompra pedidoRecebido = pedidoCompraRepository.save(pedido);
-
-        // 6. Retorna o DTO do pedido atualizado.
-        return new PedidoCompraResponseDto(pedidoRecebido);
+    // 2. Valida o status (lógica existente).
+    if (!"SOLICITADO".equals(pedido.getStatus())) {
+        throw new IllegalStateException("Apenas pedidos com status 'SOLICITADO' podem ser recebidos. Status atual: " + pedido.getStatus());
     }
+
+    // 3. Altera o status do pedido (lógica existente).
+    pedido.setStatus("RECEBIDO");
+
+    // 4. Adiciona os itens ao estoque (lógica existente).
+    for (ItemPedidoCompra item : pedido.getItens()) {
+        VariacaoProduto variacao = item.getVariacaoProduto();
+        int quantidadeRecebida = item.getQuantidade().intValue();
+        variacao.setQuantidadeEstoque(variacao.getQuantidadeEstoque() + quantidadeRecebida);
+    }
+
+    // --- NOVA LÓGICA DE INTEGRAÇÃO AQUI ---
+    // 5. Gera a conta a pagar correspondente.
+    CriarContaPagarDto contaDto = new CriarContaPagarDto(
+            pedido.getEmpresa().getIdEmpresa(),
+            pedido.getFornecedor().getIdFornecedor(),
+            "Pagamento referente ao Pedido de Compra #" + pedido.getIdPedidoCompra(),
+            pedido.getValorTotal(),
+            LocalDate.now().plusDays(30) // Exemplo: vencimento para 30 dias
+    );
+    contasPagarService.criarContaManual(contaDto);
+    // ------------------------------------
+
+    // 6. Salva o pedido e retorna o DTO (lógica existente).
+    PedidoCompra pedidoRecebido = pedidoCompraRepository.save(pedido);
+    return new PedidoCompraResponseDto(pedidoRecebido);
+}
 }
