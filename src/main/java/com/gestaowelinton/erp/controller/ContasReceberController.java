@@ -21,13 +21,9 @@ public class ContasReceberController {
 
     @PutMapping("/{id}/quitar")
     public ResponseEntity<?> quitarConta(@PathVariable Long id) {
-        try {
+       
             ContasReceberResponseDto contaPaga = contasReceberService.quitarConta(id);
             return new ResponseEntity<>(contaPaga, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        
     }
 }

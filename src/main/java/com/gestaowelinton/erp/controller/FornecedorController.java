@@ -30,12 +30,10 @@ public class FornecedorController {
     // Endpoint para BUSCAR um fornecedor por ID
     @GetMapping("/{id}")
     public ResponseEntity<FornecedorResponseDto> buscarFornecedorPorId(@PathVariable Long id) {
-        try {
+   
             FornecedorResponseDto fornecedorDto = fornecedorService.buscarFornecedorPorId(id);
             return new ResponseEntity<>(fornecedorDto, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+       
     }
 
     // Endpoint para LISTAR todos os fornecedores de uma empresa
@@ -48,22 +46,17 @@ public class FornecedorController {
     // Endpoint para ATUALIZAR um fornecedor
     @PutMapping("/{id}")
     public ResponseEntity<FornecedorResponseDto> atualizarFornecedor(  @PathVariable Long id,@Valid @RequestBody AtualizarFornecedorDto fornecedorDto) {
-        try {
+      
             FornecedorResponseDto fornecedorAtualizado = fornecedorService.atualizarFornecedor(id, fornecedorDto);
             return new ResponseEntity<>(fornecedorAtualizado, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     // Endpoint para DELETAR um fornecedor
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarFornecedor(@PathVariable Long id) {
-        try {
+     
             fornecedorService.deletarFornecedor(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+      
+}
 }

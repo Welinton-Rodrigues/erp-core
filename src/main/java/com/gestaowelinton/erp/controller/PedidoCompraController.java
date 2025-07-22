@@ -25,27 +25,18 @@ public class PedidoCompraController {
 
     @PostMapping
     public ResponseEntity<?> criarPedidoCompra(@Valid @RequestBody CriarPedidoCompraRequestDto dto) {
-        try {
+      
             PedidoCompra novoPedido = pedidoCompraService.criarPedido(dto);
             
             return new ResponseEntity<>(novoPedido, HttpStatus.CREATED);
-        } catch (NoSuchElementException e) {
-            
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Ocorreu um erro inesperado ao criar o pedido de compra.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        
     }
 @PutMapping("/{id}/receber")
     public ResponseEntity<?> receberPedido(@PathVariable Long id) {
-        try {
+       
             PedidoCompraResponseDto pedidoRecebido = pedidoCompraService.receberPedido(id);
             return new ResponseEntity<>(pedidoRecebido, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+      
     }
 
 

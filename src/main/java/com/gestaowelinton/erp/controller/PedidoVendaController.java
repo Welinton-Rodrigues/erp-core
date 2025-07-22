@@ -29,28 +29,19 @@ public class PedidoVendaController {
 
     @PostMapping
     public ResponseEntity<?> criarPedido(@Valid @RequestBody CriarPedidoVendaRequestDto pedidoDto) {
-        try {
+    
             PedidoVenda novoPedido = pedidoVendaService.criarPedido(pedidoDto);
            
             return new ResponseEntity<>(novoPedido, HttpStatus.CREATED);
-        } catch (NoSuchElementException | IllegalStateException e) {
-           
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-           
-            return new ResponseEntity<>("Ocorreu um erro inesperado ao processar o pedido.",
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+       
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PedidoVendaResponseDto> buscarPedidoPorId(@PathVariable Long id) {
-        try {
+     
             PedidoVendaResponseDto pedidoDto = pedidoVendaService.buscarPedidoPorId(id);
             return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        
     }
 
     // --- Endpoint para LISTAR todos os pedidos de uma empresa ---
@@ -64,28 +55,18 @@ public class PedidoVendaController {
     // --- Endpoint para CANCELAR um pedido ---
     @PutMapping("/{id}/cancelar")
     public ResponseEntity<?> cancelarPedido(@PathVariable Long id) {
-        try {
+      
             PedidoVendaResponseDto pedidoCancelado = pedidoVendaService.cancelarPedido(id);
             return new ResponseEntity<>(pedidoCancelado, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            // Se o pedido com o ID não existe
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (IllegalStateException e) {
-            // Se a regra de negócio impedir o cancelamento (ex: status inválido)
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+       
     }
 
      // --- Endpoint para FATURAR um pedido ---
     @PutMapping("/{id}/faturar")
     public ResponseEntity<?> faturarPedido(@PathVariable Long id) {
-        try {
+   
             PedidoVendaResponseDto pedidoFaturado = pedidoVendaService.faturarPedido(id);
             return new ResponseEntity<>(pedidoFaturado, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+     
     }
 }

@@ -22,11 +22,9 @@ public class ContasPagarController {
     private ContasPagarService contasPagarService;
     @PostMapping
     public ResponseEntity<?> criarContaManual(@Valid @RequestBody CriarContaPagarDto dto) {
-        try {
+     
             ContasPagarResponseDto novaConta = contasPagarService.criarContaManual(dto); 
             return new ResponseEntity<>(novaConta, HttpStatus.CREATED);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+       
     }
 }

@@ -23,12 +23,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
-import java.util.NoSuchElementException;    
+import java.util.NoSuchElementException;
 import com.gestaowelinton.erp.dto.cliente.CriarClienteDto;
 import com.gestaowelinton.erp.dto.cliente.ClienteResponseDto;
 import com.gestaowelinton.erp.dto.cliente.CriarClienteDto;
 import jakarta.validation.Valid;
-
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -41,31 +40,21 @@ public class ClienteController {
      * @param cliente O objeto Cliente recebido no corpo da requisição.
      * @return Uma resposta HTTP com o cliente criado e o status 201 (Created).
      */
-   @PostMapping
-public ResponseEntity<?> criarCliente(@Valid @RequestBody CriarClienteDto clienteDto) {
-    try {
+    @PostMapping
+    public ResponseEntity<?> criarCliente(@Valid @RequestBody CriarClienteDto clienteDto) {
         Cliente novoClienteEntidade = clienteService.criarCliente(clienteDto);
-        // Retornamos o DTO de resposta completo
         return new ResponseEntity<>(new ClienteResponseDto(novoClienteEntidade), HttpStatus.CREATED);
-    } catch (NoSuchElementException | IllegalStateException e) {
-        // Captura erros de "empresa não encontrada" ou "CPF/CNPJ duplicado"
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
-}
 
     /**
      * 
-     * @param id 
-     * @return 
+     * @param id
+     * @return
      */ //
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarClientePorId(@PathVariable Integer id) {
-        try {
-            ClienteResponseDto clienteDto = clienteService.buscarClientePorId(id);
-            return new ResponseEntity<>(clienteDto, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+        ClienteResponseDto clienteDto = clienteService.buscarClientePorId(id);
+        return new ResponseEntity<>(clienteDto, HttpStatus.OK);
     }
 
     /**
@@ -74,7 +63,8 @@ public ResponseEntity<?> criarCliente(@Valid @RequestBody CriarClienteDto client
      * @return Uma resposta HTTP com a lista de clientes (200 OK).
      */
     @GetMapping
-    public ResponseEntity<List<ClienteResponseDto>> listarClientesPorEmpresa(@RequestParam(name = "idEmpresa") Long idEmpresa) {
+    public ResponseEntity<List<ClienteResponseDto>> listarClientesPorEmpresa(
+            @RequestParam(name = "idEmpresa") Long idEmpresa) {
         List<ClienteResponseDto> clientes = clienteService.listarClientesPorEmpresa(idEmpresa);
         return new ResponseEntity<>(clientes, HttpStatus.OK);
     }
@@ -88,33 +78,27 @@ public ResponseEntity<?> criarCliente(@Valid @RequestBody CriarClienteDto client
      *         Not Found).
      */
 
-@PutMapping("/{id}")
-public ResponseEntity<?> atualizarCliente(
-    @PathVariable Integer id,
-    @Valid @RequestBody AtualizarClienteDto dadosAtualizados
-) {
-    try {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizarCliente(
+            @PathVariable Integer id,
+            @Valid @RequestBody AtualizarClienteDto dadosAtualizados) {
+
         Cliente clienteAtualizadoEntidade = clienteService.atualizarCliente(id, dadosAtualizados);
         ClienteResponseDto responseDto = new ClienteResponseDto(clienteAtualizadoEntidade);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
-    } catch (NoSuchElementException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+
     }
-}
 
     /**
      * @param id O ID do cliente a ser deletado.
-     * @return 
+     * @return
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarCliente(@PathVariable Integer id) {
-        try {
-            clienteService.deletarCliente(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (NoSuchElementException e) {
-         
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
+        clienteService.deletarCliente(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
     }
 
 }
