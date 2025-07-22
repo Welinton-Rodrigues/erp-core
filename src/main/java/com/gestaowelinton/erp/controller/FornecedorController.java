@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,7 +22,7 @@ public class FornecedorController {
 
     // Endpoint para CRIAR um novo fornecedor
     @PostMapping
-    public ResponseEntity<FornecedorResponseDto> criarFornecedor(@RequestBody CriarFornecedorDto fornecedorDto) {
+    public ResponseEntity<FornecedorResponseDto> criarFornecedor( @Valid @RequestBody CriarFornecedorDto fornecedorDto) {
         FornecedorResponseDto novoFornecedor = fornecedorService.criarFornecedor(fornecedorDto);
         return new ResponseEntity<>(novoFornecedor, HttpStatus.CREATED);
     }
@@ -46,7 +47,7 @@ public class FornecedorController {
 
     // Endpoint para ATUALIZAR um fornecedor
     @PutMapping("/{id}")
-    public ResponseEntity<FornecedorResponseDto> atualizarFornecedor(@PathVariable Long id, @RequestBody AtualizarFornecedorDto fornecedorDto) {
+    public ResponseEntity<FornecedorResponseDto> atualizarFornecedor(  @PathVariable Long id,@Valid @RequestBody AtualizarFornecedorDto fornecedorDto) {
         try {
             FornecedorResponseDto fornecedorAtualizado = fornecedorService.atualizarFornecedor(id, fornecedorDto);
             return new ResponseEntity<>(fornecedorAtualizado, HttpStatus.OK);

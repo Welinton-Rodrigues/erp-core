@@ -21,7 +21,6 @@ public class ErpCoreSystemApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ErpCoreSystemApplication.class, args);
 	}
-	// Dentro da sua classe ErpCoreSystemApplication.java
 
     @Bean
     public CommandLineRunner commandLineRunner(
@@ -31,7 +30,6 @@ public class ErpCoreSystemApplication {
             PasswordEncoder passwordEncoder // Adicionamos para o log
     ) {
         return args -> {
-            // Passo 1: Verificar e criar a Empresa Padrão, se necessário.
             if (empresaRepository.count() == 0) {
                 System.out.println("Nenhuma empresa encontrada. Criando empresa padrão...");
                 Empresa empresaPadrao = new Empresa();
@@ -43,7 +41,6 @@ public class ErpCoreSystemApplication {
                 System.out.println("Empresa Padrão criada com ID 1.");
             }
 
-            // Passo 2: Verificar e criar o Usuário Admin, se necessário.
             String adminEmail = "admin@erp.com";
             if (usuarioRepository.findByEmail(adminEmail).isEmpty()) {
                 System.out.println("Criando usuário ADMIN padrão...");

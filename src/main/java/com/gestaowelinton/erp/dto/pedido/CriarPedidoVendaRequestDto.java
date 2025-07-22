@@ -1,12 +1,21 @@
 package com.gestaowelinton.erp.dto.pedido;
 
 import java.util.List;
+import com.gestaowelinton.erp.dto.pedido.ItemPedidoVendaRequestDto;
+import jakarta.validation.constraints.NotBlank; 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
 
-// DTO para criar um novo pedido de venda completo
 public record CriarPedidoVendaRequestDto(
-    Integer idCliente, // O ID do cliente que está comprando
-    // Adicionamos de volta os campos que faltavam no DTO
+    @NotNull(message = "O ID do cliente não pode ser nulo")
+    Integer idCliente, 
+  
+    @NotBlank(message =" A forma de pagamento é obrigatória.")
     String formaPagamento,
+
+    @NotEmpty(message = "A lista de itens não pode estar vazia.")
+    @Valid
     String observacoes,
-    List<ItemPedidoVendaRequestDto> itens // A lista de itens da venda
+    List<ItemPedidoVendaRequestDto> itens 
 ) {}

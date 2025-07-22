@@ -24,10 +24,8 @@ public record ContasPagarResponseDto(
             conta.getDataVencimento(),
             conta.getDataPagamento(),
             conta.getStatus(),
-            // O fornecedor pode ser nulo, então precisamos checar
             conta.getFornecedor() != null ? conta.getFornecedor().getIdFornecedor() : null,
             conta.getFornecedor() != null ? conta.getFornecedor().getNomeRazaoSocial() : null,
-            // O pedido de compra também pode ser nulo
             conta.getPedidoCompra() != null ? conta.getPedidoCompra().getIdPedidoCompra() : null
         );
     }

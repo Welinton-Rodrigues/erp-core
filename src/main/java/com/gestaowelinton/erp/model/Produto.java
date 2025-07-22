@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class Produto {
 
     @Column(name = "nome", nullable = false, length = 255)
     private String nome;
-    
+
     @Column(name = "codigo_interno", length = 50)
     private String codigoInterno; // Código "pai" do produto
 
@@ -36,11 +36,10 @@ public class Produto {
     @Column(name = "status", nullable = false, length = 20)
     private String status; // "ATIVO" ou "INATIVO"
 
-  
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<VariacaoProduto> variacoes;
+    private List<VariacaoProduto> variacoes = new ArrayList<>();;
 
     // A relação com ItemPedidoVenda continua, mas precisaremos ajustá-la depois.
-   // @OneToMany(mappedBy = "produto")
-   // private List<ItemPedidoVenda> itensPedidoVenda;
+    @OneToMany(mappedBy = "produto")
+    private List<ItemPedidoVenda> itensPedidoVenda = new ArrayList<>();
 }

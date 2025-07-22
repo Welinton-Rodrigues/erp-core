@@ -15,16 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.NoSuchElementException;
 @RestController
-@RequestMapping("/api/contas-a-pagar") // A URL pode continuar a mesma, é uma boa prática
+@RequestMapping("/api/contas-a-pagar")
 public class ContasPagarController {
 
     @Autowired
-    private ContasPagarService contasPagarService; // <-- Corrigido
-
+    private ContasPagarService contasPagarService;
     @PostMapping
     public ResponseEntity<?> criarContaManual(@Valid @RequestBody CriarContaPagarDto dto) {
         try {
-            ContasPagarResponseDto novaConta = contasPagarService.criarContaManual(dto); // <-- Corrigido
+            ContasPagarResponseDto novaConta = contasPagarService.criarContaManual(dto); 
             return new ResponseEntity<>(novaConta, HttpStatus.CREATED);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

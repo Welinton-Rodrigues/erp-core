@@ -4,6 +4,9 @@ import com.gestaowelinton.erp.dto.produto.CriarProdutoDto;
 import com.gestaowelinton.erp.dto.produto.ProdutoResponseDto;
 // Remova os imports dos DTOs de atualização antigos
 import com.gestaowelinton.erp.service.ProdutoService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +24,7 @@ public class ProdutoController {
 
     // --- Endpoint de CRIAÇÃO (Totalmente Refatorado) ---
     @PostMapping
-    public ResponseEntity<ProdutoResponseDto> criarProduto(@RequestBody CriarProdutoDto produtoDto) {
+    public ResponseEntity<ProdutoResponseDto> criarProduto(@Valid @RequestBody CriarProdutoDto produtoDto) {
         ProdutoResponseDto novoProduto = produtoService.criarProduto(produtoDto);
         return new ResponseEntity<>(novoProduto, HttpStatus.CREATED);
     }
@@ -45,16 +48,16 @@ public class ProdutoController {
 
     // Dentro da classe ProdutoController.java
 
-// ... outros métodos ...
+
 
 @DeleteMapping("/{id}")
 public ResponseEntity<Void> deletarProduto(@PathVariable Long id) {
     try {
         produtoService.deletarProduto(id);
-        // Em caso de sucesso, retorna 204 No Content, pois não há corpo na resposta.
+       
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } catch (NoSuchElementException e) {
-        // Se o serviço não encontrar o produto, retorna 404 Not Found.
+       
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

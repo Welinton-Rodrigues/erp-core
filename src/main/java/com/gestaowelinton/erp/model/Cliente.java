@@ -1,6 +1,7 @@
 package com.gestaowelinton.erp.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -19,6 +20,8 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "clientes")
@@ -54,18 +57,18 @@ public class Cliente {
 
   @Column(name = "email_principal", length = 255)
   private String emailPrincipal;
+// ... (outros campos do Cliente) ...
 
-  @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-  private List<EnderecosCliente> enderecos;
+@OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+private List<EnderecosCliente> enderecos = new ArrayList<>(); // <-- CORREÇÃO AQUI
 
-  @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+@OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+private List<ContatosCliente> contatos = new ArrayList<>(); // <-- CORREÇÃO AQUI
 
-  private List<ContatosCliente> contatos;
+@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
+private List<PedidoVenda> pedidosVenda = new ArrayList<>(); // <-- CORREÇÃO AQUI
 
-  @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
-  private List<PedidoVenda> pedidosVenda;
+@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
+private List<ContasReceber> contasReceber = new ArrayList<>(); // <-- CORREÇÃO AQUI
 
-  @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
-
-  private List<ContasReceber> contasReceber;
 }

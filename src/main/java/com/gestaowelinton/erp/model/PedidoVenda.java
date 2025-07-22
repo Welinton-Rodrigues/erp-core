@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -48,7 +49,7 @@ public class PedidoVenda {
 
     // --- Itens do Pedido ---
     @OneToMany(mappedBy = "pedidoVenda", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ItemPedidoVenda> itens;
+    private List<ItemPedidoVenda> itens = new ArrayList<>();
 
     @Column(name = "formaPagamento", length = 50)
     private String formaPagamento; // Ex: "DINHEIRO", "CARTÃO", "BOLETO"

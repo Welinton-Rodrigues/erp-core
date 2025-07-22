@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import jakarta.validation.Valid;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -24,17 +24,15 @@ public class PedidoCompraController {
     private PedidoCompraService pedidoCompraService;
 
     @PostMapping
-    public ResponseEntity<?> criarPedidoCompra(@RequestBody CriarPedidoCompraRequestDto dto) {
+    public ResponseEntity<?> criarPedidoCompra(@Valid @RequestBody CriarPedidoCompraRequestDto dto) {
         try {
             PedidoCompra novoPedido = pedidoCompraService.criarPedido(dto);
-            // No futuro, criaremos um DTO de resposta para o Pedido de Compra.
-            // Por enquanto, retornar a entidade ajuda no debug.
+            
             return new ResponseEntity<>(novoPedido, HttpStatus.CREATED);
         } catch (NoSuchElementException e) {
-            // Captura erros se o fornecedor ou uma variação de produto não forem encontrados.
+            
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            // Captura qualquer outro erro inesperado.
             return new ResponseEntity<>("Ocorreu um erro inesperado ao criar o pedido de compra.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -44,10 +42,8 @@ public class PedidoCompraController {
             PedidoCompraResponseDto pedidoRecebido = pedidoCompraService.receberPedido(id);
             return new ResponseEntity<>(pedidoRecebido, HttpStatus.OK);
         } catch (NoSuchElementException e) {
-            // Se o pedido de compra com o ID não existe
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (IllegalStateException e) {
-            // Se a regra de negócio impedir o recebimento (ex: status inválido)
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
