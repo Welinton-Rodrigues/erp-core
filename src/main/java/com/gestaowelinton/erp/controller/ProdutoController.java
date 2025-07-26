@@ -1,7 +1,9 @@
 package com.gestaowelinton.erp.controller;
 
+import com.gestaowelinton.erp.dto.produto.AtualizarProdutoDto;
 import com.gestaowelinton.erp.dto.produto.CriarProdutoDto;
 import com.gestaowelinton.erp.dto.produto.ProdutoResponseDto;
+import com.gestaowelinton.erp.model.Produto;
 // Remova os imports dos DTOs de atualização antigos
 import com.gestaowelinton.erp.service.ProdutoService;
 
@@ -28,6 +30,19 @@ public class ProdutoController {
         ProdutoResponseDto novoProduto = produtoService.criarProduto(produtoDto);
         return new ResponseEntity<>(novoProduto, HttpStatus.CREATED);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProdutoResponseDto> atualizarProduto(
+            @PathVariable Long id,
+            @Valid @RequestBody AtualizarProdutoDto produtoDto
+    ) {
+       
+        
+        Produto produtoAtualizado = produtoService.atualizarProduto(id, produtoDto);
+        
+        return ResponseEntity.ok(new ProdutoResponseDto(produtoAtualizado));
+    }
+
 
     // --- Endpoints de LEITURA (Assinaturas Atualizadas) ---
     @GetMapping("/{id}")

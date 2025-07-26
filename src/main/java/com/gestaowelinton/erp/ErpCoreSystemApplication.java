@@ -15,12 +15,11 @@ import com.gestaowelinton.erp.security.service.AuthenticationService;
 
 @SpringBootApplication
 
-
 public class ErpCoreSystemApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ErpCoreSystemApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ErpCoreSystemApplication.class, args);
+    }
 
     @Bean
     public CommandLineRunner commandLineRunner(

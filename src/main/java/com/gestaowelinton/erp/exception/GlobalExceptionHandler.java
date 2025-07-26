@@ -5,13 +5,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
+import io.jsonwebtoken.ExpiredJwtException; 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 @ControllerAdvice // Anotação que torna esta classe um "conselheiro" global para os controllers
 public class GlobalExceptionHandler {
+
+    //esse metodo sera chamado sempre que um token JWT estiver expirado
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<String> handleExpiredJwtException(ExpiredJwtException ex){
+        return new ResponseEntity<>("Token JWT expirado. Por favor, faça login novamente.", HttpStatus.UNAUTHORIZED);
+    }
 
     // Este método será chamado sempre que um erro de "não encontrado" (lançado pelo .orElseThrow) acontecer
     @ExceptionHandler(NoSuchElementException.class)
@@ -38,7 +44,7 @@ public class GlobalExceptionHandler {
     // Um handler genérico para qualquer outra exceção inesperada
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGlobalException(Exception ex) {
-        // Em um ambiente real, você logaria o erro 'ex' aqui
+        
         return new ResponseEntity<>("Ocorreu um erro inesperado no servidor.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

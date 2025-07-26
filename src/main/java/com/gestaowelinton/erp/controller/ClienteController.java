@@ -5,100 +5,77 @@ import com.gestaowelinton.erp.dto.cliente.ClienteResponseDto;
 import com.gestaowelinton.erp.dto.cliente.CriarClienteDto;
 import com.gestaowelinton.erp.model.Cliente;
 import com.gestaowelinton.erp.service.ClienteService;
-
 import jakarta.validation.Valid;
-
-import java.util.NoSuchElementException;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
-import java.util.List;
-import java.util.NoSuchElementException;
-import com.gestaowelinton.erp.dto.cliente.CriarClienteDto;
-import com.gestaowelinton.erp.dto.cliente.ClienteResponseDto;
-import com.gestaowelinton.erp.dto.cliente.CriarClienteDto;
-import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+/**
+ * Controller para gerenciar as operações CRUD da entidade Cliente.
+ */
 @RestController
 @RequestMapping("/api/clientes")
+@RequiredArgsConstructor
 public class ClienteController {
 
-    @Autowired
-    private ClienteService clienteService;
+    private final ClienteService clienteService;
 
     /**
-     * @param cliente O objeto Cliente recebido no corpo da requisição.
-     * @return Uma resposta HTTP com o cliente criado e o status 201 (Created).
+     * Cria um novo cliente.
+     * @param clienteDto DTO com os dados para a criação do cliente.
+     * @return O cliente recém-criado com status 201.
      */
     @PostMapping
-    public ResponseEntity<?> criarCliente(@Valid @RequestBody CriarClienteDto clienteDto) {
+    public ResponseEntity<ClienteResponseDto> criarCliente(@Valid @RequestBody CriarClienteDto clienteDto) {
         Cliente novoClienteEntidade = clienteService.criarCliente(clienteDto);
         return new ResponseEntity<>(new ClienteResponseDto(novoClienteEntidade), HttpStatus.CREATED);
     }
 
     /**
-     * 
-     * @param id
-     * @return
-     */ //
+     * Busca um cliente específico pelo seu ID.
+     * @param id O ID do cliente a ser buscado.
+     * @return O cliente encontrado com status 200.
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarClientePorId(@PathVariable Integer id) {
+    public ResponseEntity<ClienteResponseDto> buscarClientePorId(@PathVariable Integer id) {
         ClienteResponseDto clienteDto = clienteService.buscarClientePorId(id);
-        return new ResponseEntity<>(clienteDto, HttpStatus.OK);
+        return ResponseEntity.ok(clienteDto);
     }
 
     /**
-     * 
-     * @param idEmpresa O ID da empresa, passado como um parâmetro na URL.
-     * @return Uma resposta HTTP com a lista de clientes (200 OK).
+     * Lista todos os clientes de uma empresa específica.
+     * @param idEmpresa O ID da empresa.
+     * @return Uma lista com os clientes da empresa e status 200.
      */
     @GetMapping
-    public ResponseEntity<List<ClienteResponseDto>> listarClientesPorEmpresa(
-            @RequestParam(name = "idEmpresa") Long idEmpresa) {
+    public ResponseEntity<List<ClienteResponseDto>> listarClientesPorEmpresa(@RequestParam Long idEmpresa) {
         List<ClienteResponseDto> clientes = clienteService.listarClientesPorEmpresa(idEmpresa);
-        return new ResponseEntity<>(clientes, HttpStatus.OK);
+        return ResponseEntity.ok(clientes);
     }
 
     /**
-     * 
-     * @param id               O ID do cliente a ser atualizado, vindo da URL.
-     * @param dadosAtualizados O JSON com os novos dados do cliente, vindo do corpo
-     *                         da requisição.
-     * @return Uma resposta HTTP com o cliente atualizado (200 OK) ou um erro (404
-     *         Not Found).
+     * Atualiza um cliente existente.
+     * @param id O ID do cliente a ser atualizado.
+     * @param dadosAtualizados DTO com os novos dados do cliente.
+     * @return O cliente com os dados atualizados e status 200.
      */
-
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizarCliente(
-            @PathVariable Integer id,
-            @Valid @RequestBody AtualizarClienteDto dadosAtualizados) {
-
-        Cliente clienteAtualizadoEntidade = clienteService.atualizarCliente(id, dadosAtualizados);
-        ClienteResponseDto responseDto = new ClienteResponseDto(clienteAtualizadoEntidade);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
-
+    public ResponseEntity<ClienteResponseDto> atualizarCliente(@PathVariable Integer id, @Valid @RequestBody AtualizarClienteDto dadosAtualizados) {
+        Cliente clienteAtualizado = clienteService.atualizarCliente(id, dadosAtualizados);
+        return ResponseEntity.ok(new ClienteResponseDto(clienteAtualizado));
     }
 
     /**
+     * Deleta um cliente pelo seu ID.
      * @param id O ID do cliente a ser deletado.
-     * @return
+     * @return Uma resposta vazia com status 204.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarCliente(@PathVariable Integer id) {
-
         clienteService.deletarCliente(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
+        return ResponseEntity.noContent().build();
     }
-
 }

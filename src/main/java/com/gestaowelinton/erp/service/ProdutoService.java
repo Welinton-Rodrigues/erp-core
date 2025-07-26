@@ -1,5 +1,6 @@
 package com.gestaowelinton.erp.service;
 
+import com.gestaowelinton.erp.dto.produto.AtualizarProdutoDto;
 import com.gestaowelinton.erp.dto.produto.CriarProdutoDto;
 import com.gestaowelinton.erp.dto.produto.ProdutoResponseDto;
 import com.gestaowelinton.erp.dto.produto.VariacaoProdutoDto;
@@ -90,7 +91,21 @@ public void deletarProduto(Long id) {
     produtoRepository.deleteById(id);
 }
 
+@Transactional
+public Produto atualizarProduto(Long id, AtualizarProdutoDto dto) {
+    // Busca a entidade "pai" no banco
+    Produto produtoExistente = produtoRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Produto não encontrado com o ID: " + id));
 
+    // Atualiza os campos do produto "pai" com os dados do DTO
+    produtoExistente.setNome(dto.nome());
+    produtoExistente.setCodigoInterno(dto.codigoInterno());
+    produtoExistente.setUnidadeMedida(dto.unidadeMedida());
+    produtoExistente.setStatus(dto.status());
+    // Note que não estamos mexendo nas variações por enquanto
+    
+    return produtoRepository.save(produtoExistente);
+}
 
   
 }

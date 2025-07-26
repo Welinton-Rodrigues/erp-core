@@ -40,6 +40,6 @@ public class Produto {
     private List<VariacaoProduto> variacoes = new ArrayList<>();;
 
     // A relação com ItemPedidoVenda continua, mas precisaremos ajustá-la depois.
-    @OneToMany(mappedBy = "produto")
-    private List<ItemPedidoVenda> itensPedidoVenda = new ArrayList<>();
+   // @OneToMany(mappedBy = "produto")
+   //private List<ItemPedidoVenda> itensPedidoVenda = new ArrayList<>();
 }
